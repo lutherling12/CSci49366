@@ -7,3 +7,7 @@ all:
 
 clean:
 	rm *.out *.o
+
+reset:
+	rm *.out *.o & cp 'nytBestSeller(28.02.15).txt' books.txt
+
