@@ -16,7 +16,7 @@
 void replaceSpaces (char str[], char replacementChar = '_');
 char getChar (int fd);
 off_t getBytePos (int row, int fd);
-off_t countNextLine (int fd, off_t currentOffset);
+off_t countLineByte (int fd, off_t priorOffset);
 //bool getnChar (int fd, char buffer [], int n);
 bool getNextField (int fd, char buffer []);
 	
@@ -44,7 +44,7 @@ int main (int argc, char * argv [])
 	}
 
 	rowNum = atoi (argv[1]);
-	if (rowNum < 1) {
+	if (rowNum < 2) {
 		printf ("%s\n", "first argument invalid row number.");
 		return 1;
 	}
@@ -63,7 +63,7 @@ int main (int argc, char * argv [])
 	authorLength = strlen (author);
 
 	offsetNow = getBytePos (rowNum, fileDesc);
-	oldLineLength = countNextLine (fileDesc, offsetNow);	
+	oldLineLength = countLineByte (fileDesc, offsetNow);	
 	//+2 accounts for space delimiter and '\n'.
 	newLineLength = titleLength + authorLength + 2;
 
@@ -116,11 +116,16 @@ int main (int argc, char * argv [])
 
 	else if (oldLineLength < newLineLength) {
 		//Move offset to the line after the one to be written over.
-		offsetNext = offsetNow + countNextLine (fileDesc, offsetNow);
+		lseek (fileDesc, oldLineLength, SEEK_CUR);
+		offsetNext = offsetNow + countLineByte (fileDesc, offsetNow);
 
 		//Get the title and author of the following book.
 		getNextField (fileDesc, tempTitle);
 		getNextField (fileDesc, tempAuthor);
+
+		printf ("%s %s %s\n", "Next Book: ", tempTitle, tempAuthor);
+		printf ("%ld : %ld\n", offsetNow, offsetNext);
+
 		//Move offset back.
 		lseek (fileDesc, offsetNow, SEEK_SET);
 	
@@ -152,6 +157,9 @@ int main (int argc, char * argv [])
 	
 			lseek (fileDesc, offsetNow, SEEK_SET);
 	
+			titleLength = strlen (title);
+			authorLength = strlen (author);
+
 			for (int i = 0; i < titleLength; i++) {
 				tempChar = title[i];
 				write (fileDesc, &tempChar, 1);
@@ -188,7 +196,7 @@ void replaceSpaces (char str[], char replacementChar) {
 /*Function changes offset in open file. Reset the changed offset by calling
 off_t value = lseek (int fd, off_t offsetPrior, SEEK_SET)*/
 char getChar (int fd) {
-	char c;
+	char c = '\0';
 	
 	if (read (fd, &c, 1) == 1)
 		return c;
@@ -208,30 +216,10 @@ off_t getBytePos (int row, int fd) {
 
 	return byte;
 }
-/*
-//Gets up to n-1 characters. Appends '\0' to end of buffer.
-//returns false if hits EOF.
-bool getnChar (int fd, char buffer [], int n) {
-	int bufferSize = sizeof (buffer);
-	char c;
-
-	for (int i = 0; i < bufferSize - 2 && i < n; i++) {
-		if (read (fd, &c, 1) == 1) {
-			buffer[i] = c;
-		}
-		else {
-			buffer[i] = '\0';
-			return false;
-		}
-	}
-	buffer[bufferSize - 1] = '\0';
-	return true;
-}
-*/
 
 bool getNextField (int fd, char buffer []) {
 	char c = '\0';
-	int bufferSize = sizeof (buffer);
+	int bufferSize = TITLE_BUFFER_SIZE;
 
 	for (int i = 0; i < bufferSize - 2; i++) {
 		c = getChar(fd);
@@ -251,11 +239,10 @@ bool getNextField (int fd, char buffer []) {
 	return true;
 }
 
-
-//Counts the number of bytes in next line.
-off_t countNextLine (int fd, off_t currentOffset) {
+//Counts the number of bytes in line. Undoes Offset after.
+off_t countLineByte (int fd, off_t priorOffset) {
 	int bytes = 0;
-	char c;
+	char c = '\0';
 
 	while (read (fd, &c, 1) == 1) {
 		bytes++;
@@ -265,7 +252,7 @@ off_t countNextLine (int fd, off_t currentOffset) {
 		}
 	}
 
-	lseek (fd, currentOffset, SEEK_SET);
+	lseek (fd, priorOffset, SEEK_SET);
 
 	return bytes;
 }
