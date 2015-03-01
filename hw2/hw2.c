@@ -67,8 +67,6 @@ int main (int argc, char * argv [])
 	//+2 accounts for space delimiter and '\n'.
 	newLineLength = titleLength + authorLength + 2;
 
-	printf ("%i : %i\n", oldLineLength, newLineLength);
-
 	char tempChar = '\0';
 
 	if (oldLineLength == newLineLength) {
@@ -123,7 +121,6 @@ int main (int argc, char * argv [])
 		getNextField (fileDesc, tempAuthor);
 
 		printf ("%s %s : %s\n", "Next Book: ", tempTitle, tempAuthor);
-		printf ("%ld : %ld\n", offsetNow, offsetNext);
 
 		//Move offset back.
 		lseek (fileDesc, offsetNow, SEEK_SET);
@@ -144,20 +141,20 @@ int main (int argc, char * argv [])
 
 		tempChar = '\n';
 		write (fileDesc, &tempChar, 1);
-	
+
+		//Move offset to row after next.
+		getBytePos (2, fileDesc);
+
 		do {
 			offsetNow = lseek (fileDesc, 0, SEEK_CUR);
 
 			hasTitle = getNextField (fileDesc, tempTitle);
 			hasAuthor = getNextField (fileDesc, tempAuthor);
 
-			strncpy (title, tempTitle, TITLE_BUFFER_SIZE);
-			strncpy (author, tempAuthor, AUTHOR_BUFFER_SIZE);
-
-			offsetNext = lseek (fileDesc, 0, SEEK_CUR);
-		
 			printf ("%s %s : %s\n", "Next Book: ", tempTitle, tempAuthor);
 			printf ("%ld : %ld\n", offsetNow, offsetNext);
+
+			offsetNext = lseek (fileDesc, 0, SEEK_CUR);
 
 			lseek (fileDesc, offsetNow, SEEK_SET);
 	
