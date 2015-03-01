@@ -116,14 +116,13 @@ int main (int argc, char * argv [])
 
 	else if (oldLineLength < newLineLength) {
 		//Move offset to the line after the one to be written over.
-		lseek (fileDesc, oldLineLength, SEEK_CUR);
-		offsetNext = offsetNow + countLineByte (fileDesc, offsetNow);
-
+		offsetNext = lseek (fileDesc, oldLineLength, SEEK_CUR);
+		
 		//Get the title and author of the following book.
 		getNextField (fileDesc, tempTitle);
 		getNextField (fileDesc, tempAuthor);
 
-		printf ("%s %s %s\n", "Next Book: ", tempTitle, tempAuthor);
+		printf ("%s %s : %s\n", "Next Book: ", tempTitle, tempAuthor);
 		printf ("%ld : %ld\n", offsetNow, offsetNext);
 
 		//Move offset back.
@@ -147,14 +146,19 @@ int main (int argc, char * argv [])
 		write (fileDesc, &tempChar, 1);
 	
 		do {
-			strncpy (title, tempTitle, TITLE_BUFFER_SIZE);
-			strncpy (author, tempAuthor, AUTHOR_BUFFER_SIZE);
-
 			offsetNow = lseek (fileDesc, 0, SEEK_CUR);
 
 			hasTitle = getNextField (fileDesc, tempTitle);
 			hasAuthor = getNextField (fileDesc, tempAuthor);
-	
+
+			strncpy (title, tempTitle, TITLE_BUFFER_SIZE);
+			strncpy (author, tempAuthor, AUTHOR_BUFFER_SIZE);
+
+			offsetNext = lseek (fileDesc, 0, SEEK_CUR);
+		
+			printf ("%s %s : %s\n", "Next Book: ", tempTitle, tempAuthor);
+			printf ("%ld : %ld\n", offsetNow, offsetNext);
+
 			lseek (fileDesc, offsetNow, SEEK_SET);
 	
 			titleLength = strlen (title);
@@ -219,7 +223,7 @@ off_t getBytePos (int row, int fd) {
 
 bool getNextField (int fd, char buffer []) {
 	char c = '\0';
-	int bufferSize = TITLE_BUFFER_SIZE;
+	int bufferSize = TEMP_BUFFER_SIZE;
 
 	for (int i = 0; i < bufferSize - 2; i++) {
 		c = getChar(fd);
@@ -240,6 +244,7 @@ bool getNextField (int fd, char buffer []) {
 }
 
 //Counts the number of bytes in line. Undoes Offset after.
+//When counting the first row of file, excludes first character.
 off_t countLineByte (int fd, off_t priorOffset) {
 	int bytes = 0;
 	char c = '\0';
