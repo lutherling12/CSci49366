@@ -92,7 +92,7 @@ int main (int argc, char * argv [])
 		
 		writeStr (fileDesc, author);
 
-		tempChar = '\0';
+		tempChar = ' ';
 		for (int i = 1; i <= (oldLineLength - newLineLength); i++) {
 			write (fileDesc, &tempChar, 1);
 		}
@@ -115,18 +115,12 @@ int main (int argc, char * argv [])
 		lseek (fileDesc, offsetNow, SEEK_SET);
 	
 		//Write over offset.
-		for (int i = 0; i < titleLength; i++) {
-			tempChar = title[i];
-			write (fileDesc, &tempChar, 1);
-		}
-		
+		writeStr (fileDesc, title);
+
 		tempChar = ' ';
 		write (fileDesc, &tempChar, 1);
 		
-		for (int i = 0; i < authorLength; i++) {
-			tempChar = author[i];
-			write (fileDesc, &tempChar, 1);
-		}
+		writeStr (fileDesc, author);
 
 		tempChar = '\n';
 		write (fileDesc, &tempChar, 1);
@@ -150,25 +144,25 @@ int main (int argc, char * argv [])
 			titleLength = strlen (title);
 			authorLength = strlen (author);
 
-			for (int i = 0; i < titleLength; i++) {
-				tempChar = title[i];
-				write (fileDesc, &tempChar, 1);
-			}
+			writeStr (fileDesc, title);
 		
 			tempChar = ' ';
 			write (fileDesc, &tempChar, 1);
 		
-			for (int i = 0; i < authorLength; i++) {
-				tempChar = author[i];
-				write (fileDesc, &tempChar, 1);
-			}
+			writeStr (fileDesc, author);
 
 			tempChar = '\n';
 			write (fileDesc, &tempChar, 1);
 		} while (hasTitle && hasAuthor);
 	}
 
-	return 0;
+	if (close (fileDesc) != 0) {
+		printf ("File closed unsucessfully.");
+		return 1;
+	}
+	else {
+		return 0;
+	}
 }
 
 void replaceSpaces (char str[], char replacementChar) {
