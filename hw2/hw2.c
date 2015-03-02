@@ -15,10 +15,11 @@
 
 void replaceSpaces (char str[], char replacementChar = '_');
 char getChar (int fd);
+void getLine (int fd, char container[], int n);
 off_t getBytePos (int row, int fd);
-off_t countLineByte (int fd, off_t priorOffset);
-//bool getnChar (int fd, char buffer [], int n);
+off_t countLineByte (int fd);
 bool getNextField (int fd, char buffer []);
+void writeStr (int fd, char str []);
 	
 
 int main (int argc, char * argv [])
@@ -63,7 +64,7 @@ int main (int argc, char * argv [])
 	authorLength = strlen (author);
 
 	offsetNow = getBytePos (rowNum, fileDesc);
-	oldLineLength = countLineByte (fileDesc, offsetNow);	
+	oldLineLength = countLineByte (fileDesc);	
 	//+2 accounts for space delimiter and '\n'.
 	newLineLength = titleLength + authorLength + 2;
 
@@ -71,18 +72,12 @@ int main (int argc, char * argv [])
 
 	if (oldLineLength == newLineLength) {
 
-		for (int i = 0; i < titleLength; i++) {
-			tempChar = title[i];
-			write (fileDesc, &tempChar, 1);
-		}
+		writeStr (fileDesc, title);
 		
 		tempChar = ' ';
 		write (fileDesc, &tempChar, 1);
 		
-		for (int i = 0; i < authorLength; i++) {
-			tempChar = author[i];
-			write (fileDesc, &tempChar, 1);
-		}
+		writeStr (fileDesc, author);
 
 		tempChar = '\n';
 		write (fileDesc, &tempChar, 1);
@@ -90,18 +85,12 @@ int main (int argc, char * argv [])
 
 	else if (oldLineLength > newLineLength) {
 		
-		for (int i = 0; i < titleLength; i++) {
-			tempChar = title[i];
-			write (fileDesc, &tempChar, 1);
-		}
+		writeStr (fileDesc, title);
 		
 		tempChar = ' ';
 		write (fileDesc, &tempChar, 1);
 		
-		for (int i = 0; i < authorLength; i++) {
-			tempChar = author[i];
-			write (fileDesc, &tempChar, 1);
-		}
+		writeStr (fileDesc, author);
 
 		tempChar = '\0';
 		for (int i = 1; i <= (oldLineLength - newLineLength); i++) {
@@ -197,6 +186,7 @@ void replaceSpaces (char str[], char replacementChar) {
 /*Function changes offset in open file. Reset the changed offset by calling
 off_t value = lseek (int fd, off_t offsetPrior, SEEK_SET)*/
 char getChar (int fd) {
+
 	char c = '\0';
 	
 	if (read (fd, &c, 1) == 1)
@@ -205,8 +195,30 @@ char getChar (int fd) {
 		return EOF;
 }
 
+void getLine (int fd, char container [], int n) {
+
+	off_t offsetPrior = lseek (fd, 0, SEEK_CUR);
+	char c = '\0';
+
+	for (int i = 0; i < n - 2; i++) {
+		if (read (fd, &c, 1) == 1) {
+			container[i] = c;
+		}
+		else {
+			container[i] = '\0';
+			break;
+		}
+	}
+
+	container[n-1] = '\0';
+	lseek (fd, offsetPrior, SEEK_CUR);
+
+	return;
+}
+
 //From Adriana Wise's notes - returns byte position where given row starts
 off_t getBytePos (int row, int fd) {
+	
 	int byte = 1, lines = 1, currChar;
 
 	do {
@@ -219,6 +231,7 @@ off_t getBytePos (int row, int fd) {
 }
 
 bool getNextField (int fd, char buffer []) {
+
 	char c = '\0';
 	int bufferSize = TEMP_BUFFER_SIZE;
 
@@ -242,8 +255,10 @@ bool getNextField (int fd, char buffer []) {
 
 //Counts the number of bytes in line. Undoes Offset after.
 //When counting the first row of file, excludes first character.
-off_t countLineByte (int fd, off_t priorOffset) {
-	int bytes = 0;
+off_t countLineByte (int fd) {
+
+	off_t priorOffset = lseek (fd, 0, SEEK_CUR);
+	off_t bytes = 0;
 	char c = '\0';
 
 	while (read (fd, &c, 1) == 1) {
@@ -257,4 +272,17 @@ off_t countLineByte (int fd, off_t priorOffset) {
 	lseek (fd, priorOffset, SEEK_SET);
 
 	return bytes;
+}
+
+void writeStr (int fd, char str []) {
+	
+	int length = strlen (str);
+	char c = '\0';
+
+	for (int i = 0; i < length; i++) {
+		c = str[i];
+		write (fd, &c, 1);
+	}
+
+	return; 
 }
