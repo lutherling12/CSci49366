@@ -129,10 +129,14 @@ int main (int argc, char * argv [])
 		getBytePos (2, fileDesc);
 
 		do {
+
 			offsetNow = lseek (fileDesc, 0, SEEK_CUR);
 
 			hasTitle = getNextField (fileDesc, tempTitle);
 			hasAuthor = getNextField (fileDesc, tempAuthor);
+
+			strncpy (title, tempTitle, strlen (tempTitle));
+			strncpy (author, tempAuthor, strlen (tempAuthor));
 
 			printf ("%s %s : %s\n", "Next Book: ", tempTitle, tempAuthor);
 			printf ("%ld : %ld\n", offsetNow, offsetNext);
@@ -153,6 +157,7 @@ int main (int argc, char * argv [])
 
 			tempChar = '\n';
 			write (fileDesc, &tempChar, 1);
+
 		} while (hasTitle && hasAuthor);
 	}
 
@@ -210,7 +215,8 @@ void getLine (int fd, char container [], int n) {
 	return;
 }
 
-//From Adriana Wise's notes - returns byte position where given row starts
+//From Adriana Wise's notes - returns byte position where given row starts.
+//Moves offset.
 off_t getBytePos (int row, int fd) {
 	
 	int byte = 1, lines = 1, currChar;
@@ -224,6 +230,8 @@ off_t getBytePos (int row, int fd) {
 	return byte;
 }
 
+//Gets next string delimited by ' ' or '\n'.
+//Moves offset.
 bool getNextField (int fd, char buffer []) {
 
 	char c = '\0';
@@ -247,8 +255,9 @@ bool getNextField (int fd, char buffer []) {
 	return true;
 }
 
-//Counts the number of bytes in line. Undoes Offset after.
+//Counts the number of bytes until next '\n'.
 //When counting the first row of file, excludes first character.
+//Does NOT move offset.
 off_t countLineByte (int fd) {
 
 	off_t priorOffset = lseek (fd, 0, SEEK_CUR);
@@ -268,6 +277,8 @@ off_t countLineByte (int fd) {
 	return bytes;
 }
 
+//Writes given string. 
+//Moves offset.
 void writeStr (int fd, char str []) {
 	
 	int length = strlen (str);
