@@ -15,7 +15,8 @@
 
 void replaceSpaces (char str[], char replacementChar = '_');
 char getChar (int fd);
-void getLine (int fd, char container[], int n);
+char peekChar (int fd);
+void peekLine (int fd, char container[], int n);
 off_t getBytePos (int row, int fd);
 off_t countLineByte (int fd);
 bool getNextField (int fd, char buffer []);
@@ -128,37 +129,11 @@ int main (int argc, char * argv [])
 		//Move offset to row after next.
 		getBytePos (2, fileDesc);
 
-		do {
-
-			offsetNow = lseek (fileDesc, 0, SEEK_CUR);
-
-			hasTitle = getNextField (fileDesc, tempTitle);
-			hasAuthor = getNextField (fileDesc, tempAuthor);
-
-			strncpy (title, tempTitle, strlen (tempTitle));
-			strncpy (author, tempAuthor, strlen (tempAuthor));
-
+		while (peekChar (fileDesc) != EOF) {
+			peekLine (fileDesc, tempTitle, TEMP_BUFFER_SIZE);
 			printf ("%s %s : %s\n", "Next Book: ", tempTitle, tempAuthor);
-			printf ("%ld : %ld\n", offsetNow, offsetNext);
+		}
 
-			offsetNext = lseek (fileDesc, 0, SEEK_CUR);
-
-			lseek (fileDesc, offsetNow, SEEK_SET);
-	
-			titleLength = strlen (title);
-			authorLength = strlen (author);
-
-			writeStr (fileDesc, title);
-		
-			tempChar = ' ';
-			write (fileDesc, &tempChar, 1);
-		
-			writeStr (fileDesc, author);
-
-			tempChar = '\n';
-			write (fileDesc, &tempChar, 1);
-
-		} while (hasTitle && hasAuthor);
 	}
 
 	if (close (fileDesc) != 0) {
@@ -194,7 +169,25 @@ char getChar (int fd) {
 		return EOF;
 }
 
-void getLine (int fd, char container [], int n) {
+char peekChar (int fd) {
+
+	off_t priorOffset = lseek (fd, 0, SEEK_CUR);
+	char c = '\0';
+
+	if (read (fd, &c, 1) == 1) {
+		lseek (fd, priorOffset, SEEK_SET);
+		return c;
+	}
+	else {
+		lseek (fd, priorOffset, SEEK_SET);
+		return EOF;
+	}
+
+} 
+
+//Gets next line.
+//Does NOT move offset.
+void peekLine (int fd, char container [], int n) {
 
 	off_t offsetPrior = lseek (fd, 0, SEEK_CUR);
 	char c = '\0';

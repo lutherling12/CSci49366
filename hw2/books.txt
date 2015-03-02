@@ -4,8 +4,8 @@ Fifty_Shades_of_Grey E_L_James
 Fifty_Shades_Darker E_L_James
 Fifty_Shades_Freed E_L_James
 All_the_Light_We_Cannot_See Anthony_Doerr
-GONE_GIRL_FILLER_TEXT Gillian_Flynn
-ale Kristen_Hannah
-Fifty_Shades_TrilogyT E_L_Jameslynn
-ol_of_Blue_ThreadogyT Anne_Tylerynn
-on_in_DeathThreadogyT J_D_Robberynn
+Gone_Girl Gillian_Flynn
+The_Nightingale Kristen_Hannah
+Fifty_Shades_Trilogy E_L_James
+A_Spool_of_Blue_Thread Anne_Tyler
+Obsession_in_Death J_D_Robb
