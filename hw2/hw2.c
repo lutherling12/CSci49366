@@ -11,7 +11,7 @@
 
 #define TITLE_BUFFER_SIZE 256
 #define AUTHOR_BUFFER_SIZE 256
-#define TEMP_BUFFER_SIZE 256
+#define TEMP_BUFFER_SIZE 512
 
 void replaceSpaces (char str[], char replacementChar = '_');
 char getChar (int fd);
@@ -283,4 +283,26 @@ void writeStr (int fd, char str []) {
 	}
 
 	return; 
+}
+
+bool shiftWrite (int fd, off_t shiftBytes) {
+
+	char buffer[TEMP_BUFFER_SIZE];
+	off_t priorOffset = lseek (fd, 0, SEEK_CUR);
+
+	//Assume getLine moves offset.
+	getLine (fd, buffer, TEMP_BUFFER_SIZE);	
+
+	if (peekChar != EOF) {
+		shiftWrite (fd, shiftBytes);
+		priorOffSet = lseek (fd, (off_t)(priorOffset + shiftBytes), SEEK_SET);
+		//Assumes writeStr moves offset.
+		writeStr (fd, buffer);
+		lseek (fd, priorOffset, SEEK_SET);
+		return true;
+	}
+	else {
+		return false;
+	}
+
 }
