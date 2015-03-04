@@ -1,27 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
-
 #include <fcntl.h>
-
-//For lseek()
-#include <sys/types.h>
-#include <unistd.h>
-
 #include <string.h>
+
+//For off_t
+#include <sys/types.h>
+//For lseek()
+#include <unistd.h>
 
 #define TITLE_BUFFER_SIZE 256
 #define AUTHOR_BUFFER_SIZE 256
 #define TEMP_BUFFER_SIZE 512
 
+#include "myGet.h"
+#include "myPeek.h"
+#include "myWrites.h"
+
 void replaceSpaces (char str[], char replacementChar = '_');
-char getChar (int fd);
-char peekChar (int fd);
-void peekLine (int fd, char container[], int n);
-off_t getBytePos (int row, int fd);
-off_t countLineByte (int fd);
-bool getNextField (int fd, char buffer []);
 void writeStr (int fd, char str []);
-	
+bool getNextField (int fd, char buffer []);
 
 int main (int argc, char * argv [])
 {
@@ -156,73 +153,6 @@ void replaceSpaces (char str[], char replacementChar) {
 	}
 }
 
-//From Adriana Wise's notes - read() and returns char from file
-/*Function changes offset in open file. Reset the changed offset by calling
-off_t value = lseek (int fd, off_t offsetPrior, SEEK_SET)*/
-char getChar (int fd) {
-
-	char c = '\0';
-	
-	if (read (fd, &c, 1) == 1)
-		return c;
-	else
-		return EOF;
-}
-
-char peekChar (int fd) {
-
-	off_t priorOffset = lseek (fd, 0, SEEK_CUR);
-	char c = '\0';
-
-	if (read (fd, &c, 1) == 1) {
-		lseek (fd, priorOffset, SEEK_SET);
-		return c;
-	}
-	else {
-		lseek (fd, priorOffset, SEEK_SET);
-		return EOF;
-	}
-
-} 
-
-//Gets next line.
-//Does NOT move offset.
-void peekLine (int fd, char container [], int n) {
-
-	off_t offsetPrior = lseek (fd, 0, SEEK_CUR);
-	char c = '\0';
-
-	for (int i = 0; i < n - 2; i++) {
-		if (read (fd, &c, 1) == 1) {
-			container[i] = c;
-		}
-		else {
-			container[i] = '\0';
-			break;
-		}
-	}
-
-	container[n-1] = '\0';
-	lseek (fd, offsetPrior, SEEK_CUR);
-
-	return;
-}
-
-//From Adriana Wise's notes - returns byte position where given row starts.
-//Moves offset.
-off_t getBytePos (int row, int fd) {
-	
-	int byte = 1, lines = 1, currChar;
-
-	do {
-		currChar = getChar (fd);
-		if (currChar == '\n')
-			lines++;
-	} while (lines < row && currChar != EOF && ++byte);
-
-	return byte;
-}
-
 //Gets next string delimited by ' ' or '\n'.
 //Moves offset.
 bool getNextField (int fd, char buffer []) {
@@ -246,63 +176,4 @@ bool getNextField (int fd, char buffer []) {
 	}
 	buffer[bufferSize -1] = '\0';
 	return true;
-}
-
-//Counts the number of bytes until next '\n'.
-//When counting the first row of file, excludes first character.
-//Does NOT move offset.
-off_t countLineByte (int fd) {
-
-	off_t priorOffset = lseek (fd, 0, SEEK_CUR);
-	off_t bytes = 0;
-	char c = '\0';
-
-	while (read (fd, &c, 1) == 1) {
-		bytes++;
-		//Counts the '\n'.
-		if (c == '\n') {
-			break;
-		}
-	}
-
-	lseek (fd, priorOffset, SEEK_SET);
-
-	return bytes;
-}
-
-//Writes given string. 
-//Moves offset.
-void writeStr (int fd, char str []) {
-	
-	int length = strlen (str);
-	char c = '\0';
-
-	for (int i = 0; i < length; i++) {
-		c = str[i];
-		write (fd, &c, 1);
-	}
-
-	return; 
-}
-
-bool shiftWrite (int fd, off_t shiftBytes) {
-
-	char buffer[TEMP_BUFFER_SIZE];
-	off_t priorOffset = lseek (fd, 0, SEEK_CUR);
-
-	//Assume getLine moves offset.
-	getLine (fd, buffer, TEMP_BUFFER_SIZE);	
-
-	if (peekChar != EOF) {
-		shiftWrite (fd, shiftBytes);
-		priorOffSet = lseek (fd, (off_t)(priorOffset + shiftBytes), SEEK_SET);
-		//Assumes writeStr moves offset.
-		writeStr (fd, buffer);
-		lseek (fd, priorOffset, SEEK_SET);
-		return true;
-	}
-	else {
-		return false;
-	}
-
 }
