@@ -24,17 +24,13 @@ int main (int argc, char * argv [])
 {
 	char title[TITLE_BUFFER_SIZE];
 	char author [AUTHOR_BUFFER_SIZE];
-	char tempTitle [TITLE_BUFFER_SIZE];
-	char tempAuthor [AUTHOR_BUFFER_SIZE];
 	
 	int fileDesc = open ("books.txt", O_RDWR);
-	off_t offsetNow, offsetNext;
+	off_t offsetNow;
 
 	int rowNum = 0;
 	int titleLength = 0, authorLength = 0;
 	int oldLineLength = 0, newLineLength = 0;
-
-	bool hasTitle = false, hasAuthor = false;
 
 	if (argc != 4) {
 		printf ("%s\n", 
@@ -100,18 +96,14 @@ int main (int argc, char * argv [])
 	}
 
 	else if (oldLineLength < newLineLength) {
+
+		lseek (fileDesc, oldLineLength, SEEK_CUR);
+
+		shiftWrite (fileDesc, (int)(newLineLength - oldLineLength));
+
 		//Move offset to the line after the one to be written over.
-		offsetNext = lseek (fileDesc, oldLineLength, SEEK_CUR);
-		
-		//Get the title and author of the following book.
-		getNextField (fileDesc, tempTitle);
-		getNextField (fileDesc, tempAuthor);
-
-		printf ("%s %s : %s\n", "Next Book: ", tempTitle, tempAuthor);
-
-		//Move offset back.
 		lseek (fileDesc, offsetNow, SEEK_SET);
-	
+
 		//Write over offset.
 		writeStr (fileDesc, title);
 
@@ -122,15 +114,6 @@ int main (int argc, char * argv [])
 
 		tempChar = '\n';
 		write (fileDesc, &tempChar, 1);
-
-		//Move offset to row after next.
-		getBytePos (2, fileDesc);
-
-		while (peekChar (fileDesc) != EOF) {
-			peekLine (fileDesc, tempTitle, TEMP_BUFFER_SIZE);
-			printf ("%s %s : %s\n", "Next Book: ", tempTitle, tempAuthor);
-		}
-
 	}
 
 	if (close (fileDesc) != 0) {
@@ -151,29 +134,4 @@ void replaceSpaces (char str[], char replacementChar) {
 			str[i] = replacementChar;
 		}
 	}
-}
-
-//Gets next string delimited by ' ' or '\n'.
-//Moves offset.
-bool getNextField (int fd, char buffer []) {
-
-	char c = '\0';
-	int bufferSize = TEMP_BUFFER_SIZE;
-
-	for (int i = 0; i < bufferSize - 2; i++) {
-		c = getChar(fd);
-		if (c == EOF) {
-			buffer[i] = '\0';
-			return false;
-		}
-		else if (c == ' ' || c == '\n') {
-			buffer [i] = '\0';
-			return true;
-		}
-		else {
-			buffer[i] = c;
-		}
-	}
-	buffer[bufferSize -1] = '\0';
-	return true;
 }

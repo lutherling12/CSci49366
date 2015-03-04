@@ -17,7 +17,7 @@ Or, they perform "gets" into the file.
 #include <unistd.h>
 
 char getChar (int fd);
-void getLine (int fd, char container [], int n);
+void getALine (int fd, char container [], int n);
 off_t getBytePos (int row, int fd);
 
 #endif

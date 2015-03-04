@@ -13,23 +13,30 @@ char getChar (int fd) {
 		return EOF;
 }
 
-void getLine (int fd, char container [], int n) {
+void getALine (int fd, char container [], int n) {
+
+	lseek (fd, -1, SEEK_CUR);
 
 	char c = '\0';
+	int i = 0;
 
-	for (int i = 0; i < n - 2; i++) {
-		if (read (fd, &c, 1) == 1) {
-			container[i] = c;
+	do {	
+
+		c = getChar (fd);
+
+		if ((c == '\n') || (c == EOF)) {
+			container[i] = '\n';
+			container[i+1] = '\0';
+			return;
 		}
 		else {
-			container[i] = '\0';
-			break;
+			container[i] = c;
+			i++;
 		}
-	}
 
-	container[n-1] = '\0';
+	} while (i < n - 2);
 
-	return;	
+	return;
 }
 
 //From Adriana Wise's notes - returns byte position where given row starts.

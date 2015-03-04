@@ -16,6 +16,8 @@ Or, they perform "peeks" into the file.
 //For lseek
 #include <unistd.h>
 
+#include "myGet.h"
+
 char peekChar (int fd);
 void peekLine (int fd, char container [], int n);
 off_t countLineByte (int fd);

@@ -20,27 +20,35 @@ char peekChar (int fd) {
 //Does NOT move offset.
 void peekLine (int fd, char container [], int n) {
 
-	off_t offsetPrior = lseek (fd, 0, SEEK_CUR);
+	off_t offsetPrior = lseek (fd, -1, SEEK_CUR);
 	char c = '\0';
+	int i = 0;
 
-	for (int i = 0; i < n - 2; i++) {
-		if (read (fd, &c, 1) == 1) {
-			container[i] = c;
+	do {	
+
+		c = getChar (fd);
+
+		if ((c == '\n') || (c == EOF)) {
+			container[i] = '\n';
+			container[i+1] = '\0';
+			return;
 		}
 		else {
-			container[i] = '\0';
-			break;
+			container[i] = c;
+			i++;
 		}
-	}
 
-	container[n-1] = '\0';
+	} while (i < n - 2);
+
+
+
 	lseek (fd, offsetPrior, SEEK_CUR);
 
 	return;
 }
 
 //Counts the number of bytes until next '\n'.
-//When counting the first row of file, excludes first character.
+//When counting from first row, excludes the first character.
 //Does NOT move offset.
 off_t countLineByte (int fd) {
 
@@ -58,5 +66,5 @@ off_t countLineByte (int fd) {
 
 	lseek (fd, priorOffset, SEEK_SET);
 
-	return bytes;
+	return bytes++;
 }
