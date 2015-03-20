@@ -33,11 +33,11 @@ int main (int argc, char ** argv)
 	printf ("*Name: %s \t |Binary Values: %o\n", sampleName, (buf.st_mode >> 6));
 	printf ("*Name: %s \t |Binary Values: %o\n", sampleName, buf.st_mode);
 
-	printf ("*\tSet User ID: %i\n", (buf.st_mode & 0x8000) >> 15);
-	printf ("*\tSet Group ID: %i\n", (buf.st_mode & 0x4000) >> 14);
-	printf ("*\tSticky Bit: %i\n", (buf.st_mode & 0x2000) >> 13);
-	printf ("*\tFile Type: %i\n", (buf.st_mode & 0x1E00) >> 12);
-	printf ("*\tAccess Permission: %i\n", (buf.st_mode & 0x1E00) >> 9);
+	printf ("\tSet User ID: \t%i\n", (buf.st_mode & 0x8000) >> 15);
+	printf ("\tSet Group ID: \t%i\n", (buf.st_mode & 0x4000) >> 14);
+	printf ("\tSticky Bit: \t%i\n", (buf.st_mode & 0x2000) >> 13);
+	printf ("\tFile Type: \t%i\n", (buf.st_mode & 0x1E00) >> 9);
+	printf ("\tAccess Permission: \t%i\n", (buf.st_mode & 0x1E00) >> 0);
 
 	printStars();
 
