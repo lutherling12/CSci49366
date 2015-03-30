@@ -3,41 +3,61 @@
 #include <unistd.h>
 
 #include <fcntl.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
-#define USERMASK
-#define GROUPMASK
-#define STICKYMASK
-#define FILETYPEMASK
-
 
 void printStars ();
 
 int main (int argc, char ** argv)
 {
 	if (argc == 1) {
-		open ("sampleFile", O_CREAT);
-		return 0;
+		int fd = open ("sampleFile", O_CREAT , S_IRWXU | S_IRWXG | S_IRWXO);
+		int writ = 0xDEADBEEF;
+
+		if (fd != -1) {
+			char str [] = "My permission is set to 777.";
+			writ = write (fd, &str, (int)strlen (str));
+			//writ = access ("sampleFile", W_OK);
+			close (fd);
+			
+			printf ("(%i) %s\n", writ, str);
+			return 0;
+		}
+
+		else {
+			printf ("Couldn't make sampleFile in pwd.\n");
+			return 1;
+		}
 	}
 
-	char sampleName[] = "sampleFile";
-	int sampleBinary = 19;
 	struct stat buf;
+	
+/* 	
+	Quick refresher on bit shifting.
+	
+	char sampleName[] = "sampleFile";
+	printf ("Name: %s \t |Values: %o\n", sampleName, buf.st_mode);
+	printf ("Name: %s \t |Values: %o\n", sampleName, (buf.st_mode >> 6));
+	printf ("Name: %s \t |Values: %o\n", sampleName, buf.st_mode);
+*/
+	for (int i = 1; i < argc; i++) {
 
-	stat (sampleName, &buf);
-
-	printStars();
-
-	printf ("*Name: %s \t |Binary Values: %o\n", sampleName, buf.st_mode);
-	printf ("*Name: %s \t |Binary Values: %o\n", sampleName, (buf.st_mode >> 6));
-	printf ("*Name: %s \t |Binary Values: %o\n", sampleName, buf.st_mode);
-
-	printf ("\tSet User ID: \t%i\n", (buf.st_mode & 0x8000) >> 15);
-	printf ("\tSet Group ID: \t%i\n", (buf.st_mode & 0x4000) >> 14);
-	printf ("\tSticky Bit: \t%i\n", (buf.st_mode & 0x2000) >> 13);
-	printf ("\tFile Type: \t%i\n", (buf.st_mode & 0x1E00) >> 9);
-	printf ("\tAccess Permission: \t%i\n", (buf.st_mode & 0x1E00) >> 0);
+		printStars();
+		
+		if (stat (argv[i], &buf) == -1) {
+			printf ("File %s not in pwd.\n", argv[i]);
+		}
+		else {
+			printf ("Name: \t%s\n\n", argv[i]);
+			printf ("\tOctal Value: \t\t%o\n", buf.st_mode);
+			printf ("\tSet User ID: \t\t%o\n", (buf.st_mode & 0x8000) >> 15);
+			printf ("\tSet Group ID: \t\t%o\n", (buf.st_mode & 0x4000) >> 14);
+			printf ("\tSticky Bit: \t\t%o\n", (buf.st_mode & 0x2000) >> 13);
+			printf ("\tFile Type: \t\t%o\n", (buf.st_mode & 0x1E00) >> 9);
+			printf ("\tAccess Permission: \t%o\n", (buf.st_mode & 0x01FF) >> 0);
+		}
+	}
 
 	printStars();
 
