@@ -16,12 +16,12 @@ int main (int argc, char ** argv)
 		int writ = 0xDEADBEEF;
 
 		if (fd != -1) {
-			char str [] = "My permission is set to 777.";
+			char str [] = "My permission should be set to 777.";
 			writ = write (fd, &str, (int)strlen (str));
 			//writ = access ("sampleFile", W_OK);
 			close (fd);
 			
-			printf ("(%i) %s\n", writ, str);
+			printf ("(%o) %s\n", writ, str);
 			return 0;
 		}
 
