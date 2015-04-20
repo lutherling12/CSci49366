@@ -28,8 +28,9 @@ the call to ftw(), or as an absolute pathname.
 sb is a pointer to the stat structure returned by a call to stat(2) for fpath.  typeflag is an integer that has one of the following values:
 FTW_F, FTW_D, FTW_DNR, FTW_NS.*/
 typedef int fn (const char *, const struct stat *, int);
+static fn countEachChild;
 
-static fn forEachChild;
+static int fromPath (char * path, countEachChild * countTypes);
 
 static struct count {
   //There are 9 file types:
@@ -42,17 +43,41 @@ static struct count {
   long sock;   //Socket
 };
 
+int main (int argc, char ** argv) 
+{
+  return fromPath(argv[1], countEachChild);
+}
+
+static int fromPath (char * path, countEachChild * countTypes) {
+  return ftw (path, countTypes, MAXDIROPEN);
+}
+
 static int fn (const char *path, const struct stat * statptr, int typeflag) {
   if (typeFlag == FTW_F) {
-
+    switch (statptr->st_mode & S_IFMT) {
+      case S_IFREG:   count->reg++;    break;
+      case S_IFBLK:   count->blk++;    break;
+      case S_IFCHR:   count->chsp++;   break;
+      case S_IFIFO:   count->fifo++;   break;
+      case S_IFLNK:   count->slink++;  break;
+      case S_IFSOCK:  count->sock++;   break;
+      case S_IFDIR:   
+        perror("Directory error");
+        break;
+    }
   }
   else if (typeFlag == FTW_D) {
-
+    count.dir++;
   }
   else if (typeFlag == FTW_DNR) {
-
+    perror("Cannot access directory %s", path);
   }
   else if (typeFlag == FTWN_NS) {
-
+    perror("Cannot call stat() on %s", path);
   }
+  else {
+    perror("Unknown file type at %s", path);
+  }
+
+  return 0;
 }
