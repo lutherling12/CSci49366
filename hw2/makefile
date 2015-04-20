@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-c -Wall
+CFLAGS=-c -Wall 
 SOURCE=hw2.o myGet.o myPeek.o myWrites.o
 
 all: hw2

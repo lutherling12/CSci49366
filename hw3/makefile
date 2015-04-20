@@ -1,5 +1,5 @@
-CC=g++
-CFLAGS=-c -Wall
+CC=gcc
+CFLAGS=-c -Wall -std=c11
 
 all: hw3.1 hw3.2
 

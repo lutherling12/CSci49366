@@ -12,11 +12,11 @@ void printStars ();
 int main (int argc, char ** argv)
 {
 	if (argc == 1) {
-		int fd = open ("sampleFile", O_CREAT , S_IRWXU | S_IRWXG | S_IRWXO);
+		int fd = open ("sampleFile", O_CREAT|O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO);
 		int writ = 0xDEADBEEF;
 
 		if (fd != -1) {
-			char str [] = "My permission should be set to 777.";
+			char str [] = "My permission should be set to 777. Might be 775 due to umask.";
 			writ = write (fd, &str, (int)strlen (str));
 			//writ = access ("sampleFile", W_OK);
 			close (fd);
