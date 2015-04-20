@@ -5,7 +5,7 @@ This repository contains assignments done for the Unix Tools, an elective at Hun
 
 
 The textbook used for this class is:
-*Advanced Programming in the Unix Environment, 3rd Edition*\n
+*Advanced Programming in the Unix Environment, 3rd Edition*
 by W. Richard Stevens and Stephen A. Rago.
 
 
