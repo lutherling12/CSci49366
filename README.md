@@ -7,8 +7,8 @@ The textbook used for this class is:
 
 
 >Advanced Programming in the Unix Environment, 3rd Edition 
-
-by W. Richard Stevens and Stephen A. Rago.
+>
+>by W. Richard Stevens and Stephen A. Rago.
 
 
 It can be found [here](http://www.amazon.com/Advanced-Programming-UNIX-Environment-Edition/dp/0321637739).
