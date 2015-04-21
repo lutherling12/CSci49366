@@ -1,14 +1,19 @@
 #include <stdlib.h>
 #include <pwd.h>
 #include <stdio.h>
+#include <limits.h>
+#include <unistd.h>
 
 int main (int argc, char ** argv) {
-  int counter = 0;
   struct passwd * temp;
-   
-  temp = getpwuid (counter);
-
-  printf ("%s\n", temp->pw_name); 
+  
+  for (int i=0; i <= INT_MAX; i++) {
+    temp = getpwuid (i);
+    if (temp != NULL) {
+      printf ("%s\n", temp->pw_name);
+    }
+    sleep (1); 
+  }
 
   return 0;
 }
