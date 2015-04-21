@@ -7,11 +7,12 @@
 void printHeader ();
 
 int main (int argc, char ** argv) {
+  
   struct passwd * temp;
   
   for (int i=0; i <= INT_MAX; i++) {
-    if (i % 20 == 0) {
-      void printHeader ();
+    if ((i % 20) == 0) {
+      printHeader ();
     }
 
     temp = getpwuid (i);
@@ -21,8 +22,8 @@ int main (int argc, char ** argv) {
       printf ("%*s\n", -20, temp->pw_name);
     }
     else {
-      printf ("%*i\n", +10, i);
-      printf ("%*s\n", -20, "Unassigned");
+      printf ("%*i |", +10, i);
+      printf ("%*s\n", -20, "");
     }
     sleep (1); 
   }
@@ -36,8 +37,8 @@ void printHeader () {
     printf ("*");
   }
 
-  printf ("%*s", +10, "ID Number");
-  printf ("%*s", -20, "Username");
+  printf ("%*s", +10, "  ID Number|");
+  printf ("%*s\n", -20, "Username");
 
   for (int i = 1; i <= 80; i++) {
     printf ("*");
