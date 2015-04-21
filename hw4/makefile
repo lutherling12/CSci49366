@@ -1,4 +1,4 @@
-CC=g++
+CC=gcc
 CFLAGS=-c -Wall
 OBJS=hw4.o
 

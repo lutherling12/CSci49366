@@ -1,4 +1,13 @@
-/*The original assignment calls for a program that traverses through a file tree, determines the file type for each child, and prints the percentage of children that fit into each file type. However, this program can be found in section 4.22 of Advanced Programming in the UNIX Environment, 3rd edition written by W. Richard Stevens. Since the intent of this is to demonstrate the usage of calling ftw() through his own implementation via myftw(), dopath(), myfunc(), and path_alloc(), I will write a program that utilizes the regular ftw() found in C library.*/
+/*The original assignment calls for a program that traverses through 
+a file tree, determines the file type for each child, and prints the 
+percentage of children that fit into each file type. However, this 
+program can be found in section 4.22 of Advanced Programming 
+in the UNIX Environment, 3rd edition written by W. Richard Stevens. 
+
+Since the intent of this is to demonstrate the usage of calling ftw()
+through his own implementation via myftw(), dopath(), myfunc(), and 
+path_alloc(), I will write a program that utilizes the regular ftw() 
+found in C library.*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -30,8 +39,6 @@ FTW_F, FTW_D, FTW_DNR, FTW_NS.*/
 typedef int fn (const char *, const struct stat *, int);
 static fn countEachChild;
 
-static int fromPath (char *, fn *);
-
 struct fileTypes {
   //There are 9 file types:
   long reg;    //Regular
@@ -41,47 +48,90 @@ struct fileTypes {
   long fifo;   //FIFO
   long slink;  //Symbolic Link
   long sock;   //Socket
-  fileTypes () {
-    reg = 0;  dir = 0; blk = 0; chsp = 0; fifo = 0; slink = 0;  sock = 0;
-  }
 };
 
-static fileTypes count;
+static struct fileTypes count = (struct fileTypes){.reg = 0, .dir = 0, .blk = 0, .chsp = 0, .fifo = 0, .slink = 0, .sock = 0};
+double sum (const struct fileTypes counter) {
+  return counter.reg + counter.dir + counter.blk + counter.chsp + counter.fifo + counter.slink + counter.sock;
+}
+
+static int fromPath (char *, fn *);
 
 int main (int argc, char ** argv) 
 {
-  return fromPath(argv[1], countEachChild);
+  double totalFiles = 0xDEADBEEF;
+
+  if (argc != 2) {
+    printf ("Usage: prog parent_directory");
+  }
+
+  fromPath(argv[1], countEachChild);
+  totalFiles = sum (count);
+
+  printf ("\t%li (%.2f%%) were directories.\n", count.dir, (count.dir/totalFiles) * 100);
+  printf ("\t%li (%.2f%%) were regular files.\n", count.reg, (count.reg/totalFiles) * 100);
+  printf ("\t%li (%.2f%%) were block specials.\n", count.blk, (count.blk/totalFiles)* 100);
+  printf ("\t%li (%.2f%%) were character specials.\n", count.chsp, (count.chsp/totalFiles) * 100);
+  printf ("\t%li (%.2f%%) were FIFOs.\n", count.fifo, (count.fifo/totalFiles) * 100);
+  printf ("\t%li (%.2f%%) were symbolic links.\n", count.slink, (count.slink/totalFiles) * 100);
+  printf ("\t%li (%.2f%%) were sockets.\n", count.sock, (count.sock/totalFiles) * 100);
+  printf ("\t%i files total.\n", (int)totalFiles);
+
+  return 0;
 }
 
 static int fromPath (char * path, fn * doFunction) {
   return ftw (path, doFunction, MAXDIROPEN);
 }
 
-static int fn (const char * path, const struct stat * statptr, int typeFlag) {
+static int countEachChild (const char * path, const struct stat * statptr, int typeFlag) {
+
   if (typeFlag == FTW_F) {
+    printf ("%*s", -60, path);
+
     switch (statptr->st_mode & S_IFMT) {
-      case S_IFREG:   count.reg++;    break;
-      case S_IFBLK:   count.blk++;    break;
-      case S_IFCHR:   count.chsp++;   break;
-      case S_IFIFO:   count.fifo++;   break;
-      case S_IFLNK:   count.slink++;  break;
-      case S_IFSOCK:  count.sock++;   break;
+      case S_IFREG:   
+        count.reg++;
+        printf(" Regular file\n");
+        break;
+      case S_IFBLK:   
+        count.blk++;
+        printf(" Block Special\n");
+        break;
+      case S_IFCHR:
+        count.chsp++;
+        printf(" Character Special\n");
+        break;
+      case S_IFIFO:
+        count.fifo++;
+        printf(" FIFO\n");
+        break;
+      case S_IFLNK:
+        count.slink++;
+        printf(" Symbolic Link\n");
+        break;
+      case S_IFSOCK:
+        count.sock++;
+        printf(" Socket\n");
+        break;
       case S_IFDIR:   
-        printf("Directory error");
+        printf(" Directory Error\n");
         break;
     }
   }
   else if (typeFlag == FTW_D) {
+    printf ("%*s", -60, path);
     count.dir++;
+    printf (" Directory\n");
   }
   else if (typeFlag == FTW_DNR) {
-    printf("Cannot access directory %s", path);
+    printf("! ERROR Cannot access directory %s\n", path);
   }
   else if (typeFlag == FTW_NS) {
-    printf("Cannot call stat() on %s", path);
+    printf("! ERROR Cannot call stat() on %s\n", path);
   }
   else {
-    printf("Unknown file type at %s", path);
+    printf("! ERROR Unknown file type for %s\n", path);
   }
 
   return 0;
