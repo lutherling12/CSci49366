@@ -30,9 +30,9 @@ FTW_F, FTW_D, FTW_DNR, FTW_NS.*/
 typedef int fn (const char *, const struct stat *, int);
 static fn countEachChild;
 
-static int fromPath (char * path, countEachChild * countTypes);
+static int fromPath (char *, fn *);
 
-static struct count {
+struct fileTypes {
   //There are 9 file types:
   long reg;    //Regular
   long dir;    //Directory
@@ -41,28 +41,33 @@ static struct count {
   long fifo;   //FIFO
   long slink;  //Symbolic Link
   long sock;   //Socket
+  fileTypes () {
+    reg = 0;  dir = 0; blk = 0; chsp = 0; fifo = 0; slink = 0;  sock = 0;
+  }
 };
+
+static fileTypes count;
 
 int main (int argc, char ** argv) 
 {
   return fromPath(argv[1], countEachChild);
 }
 
-static int fromPath (char * path, countEachChild * countTypes) {
-  return ftw (path, countTypes, MAXDIROPEN);
+static int fromPath (char * path, fn * doFunction) {
+  return ftw (path, doFunction, MAXDIROPEN);
 }
 
-static int fn (const char *path, const struct stat * statptr, int typeflag) {
+static int fn (const char * path, const struct stat * statptr, int typeFlag) {
   if (typeFlag == FTW_F) {
     switch (statptr->st_mode & S_IFMT) {
-      case S_IFREG:   count->reg++;    break;
-      case S_IFBLK:   count->blk++;    break;
-      case S_IFCHR:   count->chsp++;   break;
-      case S_IFIFO:   count->fifo++;   break;
-      case S_IFLNK:   count->slink++;  break;
-      case S_IFSOCK:  count->sock++;   break;
+      case S_IFREG:   count.reg++;    break;
+      case S_IFBLK:   count.blk++;    break;
+      case S_IFCHR:   count.chsp++;   break;
+      case S_IFIFO:   count.fifo++;   break;
+      case S_IFLNK:   count.slink++;  break;
+      case S_IFSOCK:  count.sock++;   break;
       case S_IFDIR:   
-        perror("Directory error");
+        printf("Directory error");
         break;
     }
   }
@@ -70,13 +75,13 @@ static int fn (const char *path, const struct stat * statptr, int typeflag) {
     count.dir++;
   }
   else if (typeFlag == FTW_DNR) {
-    perror("Cannot access directory %s", path);
+    printf("Cannot access directory %s", path);
   }
-  else if (typeFlag == FTWN_NS) {
-    perror("Cannot call stat() on %s", path);
+  else if (typeFlag == FTW_NS) {
+    printf("Cannot call stat() on %s", path);
   }
   else {
-    perror("Unknown file type at %s", path);
+    printf("Unknown file type at %s", path);
   }
 
   return 0;
