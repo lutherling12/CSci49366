@@ -1,5 +1,5 @@
 /******************************************************************************
-Title:        Assignment 1
+Title:        Unix Tools - Assignment 1
 Author:       Luther Ling
 
 Description:
