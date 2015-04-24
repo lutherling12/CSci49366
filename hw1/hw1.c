@@ -1,3 +1,15 @@
+/******************************************************************************
+Title:        Assignment 1
+Author:       Luther Ling
+
+Description:
+The assignment covers writing to file through a file descriptor. It prompts the 
+user for their name, and then writes their string to a newly created file called
+"myNameIs" in present working directory via write(). The person's name must be
+shorter than 4096 characters (null character included).
+******************************************************************************/
+
+
 #include <stdlib.h>
 #include <stdio.h>
 
