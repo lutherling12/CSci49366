@@ -7,5 +7,5 @@ All_the_Light_We_Cannot_See Anthony_Doerr
 Gone_Girl Gillian_Flynn
 The_Nightingale Kristen_Hannah
 Fifty_Shades_Trilogy E_L_James
-A_Spool_of_Blue_Thread Anne_Tyler
+newTitle newAuthor               
 Obsession_in_Death J_D_Robb

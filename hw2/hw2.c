@@ -1,3 +1,27 @@
+/******************************************************************************
+Title:    Unix Tools - Assignment 2 - Book List
+Author:   Luther Ling
+
+Build:    make all
+Usage:    ./a.out lineNumber newTitle newAuthor
+
+Description:
+Building off the last assignment of writing to file, this takes an existing
+file called "books.txt" in the present working directory, and replaces 
+a designated line with newTitle and newAuthor via lseeking. The first line
+in the file cannot be replaced, as I had trouble getting the first 
+character of the file replaced via lseeking methods. 
+
+The expected format of each line in "books.txt" is:
+Line 1: Title Author
+Line n: "author_of_the_book title_of_the_book\n"
+i.e. both fields are separated via spaces.
+
+To clarify, if "example string" is typed in as newTitle or new Author, the 
+spaces are replaced with underscores ("example_string") in the resulting 
+document. newTitle and newAuthor arguments have a size limit set to
+(TITLE/AUTHOR)_BUFFER_SIZE.
+******************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -16,8 +40,12 @@
 #include "myPeek.h"
 #include "myWrites.h"
 
+/*Replaces all whitespaces in string str with char replacementChar.*/
 void replaceSpaces (char str[], char replacementChar = '_');
+/*Write a string into file with file descriptor fd*/
 void writeStr (int fd, char str []);
+/*From file with file descriptor fd's current offset, put the next field
+(either title or author) into buffer.*/
 bool getNextField (int fd, char buffer []);
 
 int main (int argc, char * argv [])
@@ -64,6 +92,8 @@ int main (int argc, char * argv [])
 
 	char tempChar = '\0';
 
+  /*If the byte count of the content being replaced is equal to the
+  byte count of newTitle and newAuthor, overwrite the line.*/
 	if (oldLineLength == newLineLength) {
 
 		writeStr (fileDesc, title);
@@ -77,7 +107,10 @@ int main (int argc, char * argv [])
 		write (fileDesc, &tempChar, 1);
 	}
 
-	else if (oldLineLength > newLineLength) {
+  /*If the byte count of the line being replaced is greater than the
+  byte count of newTitle and newAuthor, write the new contents, then
+  pad it with spaces.*/
+  	else if (oldLineLength > newLineLength) {
 		
 		writeStr (fileDesc, title);
 		
@@ -95,6 +128,10 @@ int main (int argc, char * argv [])
 		write (fileDesc, &tempChar, 1);
 	}
 
+  /*If the byte count of the line being replaced is less than the byte
+  count of the newTitle and newAuthor, write the content via tail recursion
+  such that each line shifts over however many bytes and makes space 
+  for the new content.*/
 	else if (oldLineLength < newLineLength) {
 
 		lseek (fileDesc, oldLineLength, SEEK_CUR);
