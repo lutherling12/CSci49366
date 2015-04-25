@@ -1,3 +1,20 @@
+/******************************************************************************
+Title:    Unix Tools - Assignment 3.2 - File Stat
+Author:   Luther Ling
+
+Build:    make hw3.2
+Usage:    ./a.out fileInput
+
+Description:
+If the program is given at least one fileInput argument, it calls stat on each 
+fileInput and outputs the 16 bits that can be found in the stat structure 
+containing properties of the file, which are meant to be taken as octal values.
+This includes the User ID and Group ID of the owner, its Sticky bit, File Type,
+and Access Permissions.
+
+If the program is given no arguments, "sampleFile" is created 
+for demonstration purposes.
+******************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -72,4 +89,3 @@ void printStars () {
 	printf("\n");
 
 }
-
