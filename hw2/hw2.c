@@ -21,6 +21,13 @@ To clarify, if "example string" is typed in as newTitle or new Author, the
 spaces are replaced with underscores ("example_string") in the resulting 
 document. newTitle and newAuthor arguments have a size limit set to
 (TITLE/AUTHOR)_BUFFER_SIZE.
+
+Extra:
+The terminal command "make all" builds the program, while make clean will 
+remove the executable and .o files, there is the command, "make reset".
+which is meant to be used when user is done testing by overwriting lines 
+in "books.txt". Changes to "books.txt" can be undone through "make reset",
+which overwrites "books.txt" with the file "nytBestSeller(28.02.15).txt".
 ******************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>

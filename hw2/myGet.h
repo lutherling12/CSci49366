@@ -10,17 +10,16 @@ Description:
 These functions read from an input file and leaves the offset where it is when
 it is done; they alter and displace the offset when called. 
 
-getChar takes the file descriptor of an open file. Returns the next character 
-from the offset.
+getChar takes the file descriptor of an open file, fd. Returns the 
+next character from the offset. and the file descriptor
 
-getALine takes the file descriptor of an open file, a container in which to store that in,
+getALine stores in string container the next line from the offset of open file 
+with file descriptor, fd, or stops after getting n number of characters.
+Returns nothing.
+
+getBytePos get the byte number of the '\n' after row (argument) number of rows
+in open file with file descriptor fd.
 ******************************************************************************/
-
-/******************************************************************************
-
-Or, they perform "gets" into the file.
-******************************************************************************/
-
 #ifndef MY_GET
 #define MY_GET
 
