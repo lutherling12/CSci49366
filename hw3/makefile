@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -Wall -std=c11
+CFLAGS=-c -Wall -std=c99
 
 all: hw3.1 hw3.2
 
