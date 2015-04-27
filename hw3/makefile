@@ -4,10 +4,10 @@ CFLAGS=-c -Wall -std=c11
 all: hw3.1 hw3.2
 
 hw3.1: hw3.1.o
-	$(CC) hw3.1.o -o hw3.1.out
+	$(CC) hw3.1.o -o a.out
 
 hw3.2: hw3.2.o
-	$(CC) hw3.2.o -o hw3.2.out
+	$(CC) hw3.2.o -o b.out
 
 hw3.1.o: hw3.1.c
 	$(CC) $(CFLAGS) hw3.1.c
