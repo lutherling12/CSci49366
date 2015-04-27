@@ -5,6 +5,7 @@
 
 #include <pwd.h>
 #include <grp.h>
+#include <sys/types.h>
 
 void printHeader ();
 
@@ -25,7 +26,7 @@ int main (int argc, char ** argv) {
       printf ("%*i |", +10, i);
       printf ("%*s", -20, temp_pw->pw_name);
       temp_gid = temp_pw->pw_gid;
-      temp_gr = getgrid (temp_gid);
+      temp_gr = getgrgid (temp_gid);
       printf ("%*i |", +10, temp_gid);
       printf ("%*s\n", -20, temp_gr->gr_name);
     }
@@ -46,7 +47,9 @@ void printHeader () {
   }
 
   printf ("%*s", +10, "  ID Number|");
-  printf ("%*s\n", -20, "Username");
+  printf ("%*s", -20, "Username");
+  printf ("%*s", +10, " GID Number|");
+  printf ("%*s\n", +10, "Group Number");
 
   for (int i = 1; i <= 80; i++) {
     printf ("*");
