@@ -23,15 +23,15 @@ int main (int argc, char ** argv) {
     temp_pw = getpwuid (i);
 
     if (temp_pw != NULL) {
-      printf ("%*i |", +10, i);
+      printf ("%*i |", 10, i);
       printf ("%*s", -20, temp_pw->pw_name);
       temp_gid = temp_pw->pw_gid;
       temp_gr = getgrgid (temp_gid);
-      printf ("%*i |", +10, temp_gid);
+      printf ("%*i |", 10, temp_gid);
       printf ("%*s\n", -20, temp_gr->gr_name);
     }
     else {
-      printf ("%*i |", +10, i);
+      printf ("%*i |", 10, i);
       printf ("%*s\n", -20, "");
     }
     sleep (1); 
@@ -46,10 +46,10 @@ void printHeader () {
     printf ("*");
   }
 
-  printf ("%*s", +10, "  ID Number|");
+  printf ("%*s", 10, "  ID Number|");
   printf ("%*s", -20, "Username");
-  printf ("%*s", +10, " GID Number|");
-  printf ("%*s\n", +10, "Group Number");
+  printf ("%*s", 10, " GID Number|");
+  printf ("%*s\n", 10, "Group Number");
 
   for (int i = 1; i <= 80; i++) {
     printf ("*");

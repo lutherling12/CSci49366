@@ -20,11 +20,11 @@ int main (int argc, char ** argv) {
     temp_gr = getgrgid ((gid_t)i);
       
     if (temp_gr != NULL) {
-      printf ("%*i |", +10, i);
+      printf ("%*i |", 10, i);
       printf ("%*s\n", -20, temp_gr->gr_name);
     }
     else {
-      printf ("%*i |", +10, i);
+      printf ("%*i |", 10, i);
       printf ("%*s\n", -20, "");
     }
     sleep (1);
@@ -39,7 +39,7 @@ void printHeader () {
     printf ("*");
   }
 
-  printf ("%*s", +10, "   Group ID|");
+  printf ("%*s", 10, "   Group ID|");
   printf ("%*s\n", -20, "Group Name");
 
   for (int i = 1; i <= 80; i++) {

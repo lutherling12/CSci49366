@@ -1,7 +1,6 @@
 /*Wait3() is considered "obsolete" and waitpid/waitid are suggested 
 alternatives, but  the assignment calls for usage of wait3() due to
 collection of resource usage (rusage) of the child(?) process.*/
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -16,6 +15,8 @@ collection of resource usage (rusage) of the child(?) process.*/
 #include <sys/wait.h>
 
 #include <limits.h>
+
+void printHeader ();
 
 int main (int argc, char ** argv[])
 {
@@ -33,35 +34,51 @@ int main (int argc, char ** argv[])
     //Else parent 
     else {
       childPID = wait3 (status, 0, myProcess);
-      printf ("PID: %li\n", (long int)childPID);
+      getrusage (RUSAGE_CHILDREN, &myProcess);
       errNo++;
     }
 
-    printf ("Maximum Resident Set Size: %li\n", 
+    printHeader();
+
+    //The disabled fields are "unmaintained" on Linux.
+    printf ("%*s %i\n", 35, "Error Number:",
+      errNo);
+
+    printf ("%*s %li\n", 35, "User CPU Time (sec):",
+      myProcess.ru_utime.tv_sec);
+    printf ("%*s %li\n", 35, "System CPU Time (sec):",
+      myProcess.ru_stime.tv_sec);
+    printf ("%*s %li\n", 35, "Maximum Resident Set Size (kB):",   
       myProcess.ru_maxrss);
-    printf ("Integral Shared Memory Size: %li\n", 
-      myProcess.ru_ixrss);
-    printf ("Integral Unshared Data Size: %li\n", 
-      myProcess.ru_idrss);
-    printf ("Integral Unshared Stack Size: %li\n", 
-      myProcess.ru_isrss);
-    printf ("Page Reclaims: %li\n", 
+    /*
+      printf ("%*s %li\n", 35, "Integral Shared Memory Size (kB):", 
+        myProcess.ru_ixrss);
+      printf ("%*s %li\n", 35, "Integral Unshared Data Size (kB):", 
+        myProcess.ru_idrss);
+      printf ("%*s %li\n", 35, "Integral Unshared Stack Size (kB):", 
+        myProcess.ru_isrss);
+    */
+    printf ("%*s %li\n", 35, "Page Reclaims:", 
       myProcess.ru_minflt);
-    printf ("Page Faults: %li\n", 
+    printf ("%*s %li\n", 35, "Page Faults:", 
       myProcess.ru_nswap);
-    printf ("Swaps: %li\n", 
-      myProcess.ru_inblock);
-    printf ("Block Input Operations: %li\n", 
+    /*
+      printf ("%*s %li\n", 35, "Swaps:", 
+        myProcess.ru_inblock);
+    */
+    printf ("%*s %li\n", 35, "Block Input Operations:", 
       myProcess.ru_oublock);
-    printf ("%li\n", 
-      myProcess.ru_msgsnd);
-    printf ("%li\n", 
-      myProcess.ru_msgrcv);
-    printf ("%li\n", 
-      myProcess.ru_nsignals);
-    printf ("%li\n", 
+    /*
+      printf ("%*s %li\n", 35, "IPC Messages Sent:", 
+        myProcess.ru_msgsnd);
+      printf ("%*s %li\n", 35, "IPC Messsages Received:", 
+        myProcess.ru_msgrcv);
+      printf ("%*s %li\n", 35, "Signals Received:", 
+        myProcess.ru_nsignals);
+    */
+    printf ("%*s %li\n", 35, "Voluntary Context Switches:", 
       myProcess.ru_nvcsw);
-    printf ("%li\n", 
+    printf ("%*s %li\n", 35, "Involuntary Context Switches:",
       myProcess.ru_nivcsw);
 
     sleep (1);
@@ -69,4 +86,11 @@ int main (int argc, char ** argv[])
 
 
   return 0;
+}
+
+void printHeader () {
+  for (int i = 1; i <= 80; i++) {
+    printf ("*");
+  }
+  printf ("\n");
 }
