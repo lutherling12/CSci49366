@@ -23,7 +23,6 @@ collection of resource usage (rusage) of the child(?) process.*/
 #include <limits.h>
 
 void printHeader ();
-void findMacro(const int);
 void printSig (int);
 
 int main (int argc, char ** argv)
@@ -31,32 +30,35 @@ int main (int argc, char ** argv)
   struct rusage myProcess;
   int ret;
   int status = 0;
+  int errNo = 0;
   pid_t childPID;
 
-  //Exit codes only range from 0 to 255. 
-  for (int i = 0; i <= 255; i++) {
+  /*Signal 9 (SIGKILL) and Signal 17, 19, 23 (SIGSTOP) are buggy 
+  and do not produce output, because, according to man 7 signal:
+  "The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored."*/
+
+  for (int i = 1; i <= 255; i++) {
     //If child
-    if ((ret = vfork ()) == 0) {
-      printf ("%s %i\n", "Iteration:", i);
+    if ((ret = fork ()) == 0) {
+      printf ("%s %i\t", "Iteration:", i);
       childPID = getpid();
-      printf ("%s %li\n", "Child PID:", (long int)getpid());
+      //printf ("%s %li\t", "Child PID:", (long int)getpid());
+      
       signal (i, printSig);
-      kill(childPID, i);
-      kill (getpid(), 18);
+      errNo = kill(childPID, i);
+      printf ("%s %i\t", "ErrNo:", errNo);
 
       exit(0);
     }
     //Else parent 
     else {
+      sleep (1);
+      kill(ret, SIGCONT);
       wait3 (&status, 0, &myProcess);
       getrusage (RUSAGE_CHILDREN, &myProcess);
-      printHeader();
+      //printHeader();
 
-      printf ("%*s %i ", 35, "Status Number:",
-        status);
-      findMacro (status);
-      printf ("%*s %li\n", 35, "User CPU Time (sec):",
-        myProcess.ru_utime.tv_sec);
+      printf ("%s %li\n", "User CPU Time (sec):", myProcess.ru_utime.tv_usec);
     /*
         Other fields are disabled because time is retrieved
         and is sufficient for proof of concept.
@@ -92,7 +94,6 @@ int main (int argc, char ** argv)
 
     }
 
-    //sleep (1);
   }
 
   return 0;
@@ -103,17 +104,6 @@ void printHeader () {
     printf ("*");
   }
   printf ("\n");
-}
-
-void findMacro (const int termStatus) {
-  switch (termStatus) {
-    case EXIT_SUCCESS:
-      printf ("Exit Success.\n");
-      break;
-    default:
-      printf("Undefined Exit.\n");
-      break;
-  }
 }
 
 void printSig (int signum) {
@@ -212,7 +202,7 @@ void printSig (int signum) {
       printf("%*s %i\n", 25, "SIGXFSZ: ", SIGXFSZ);
       break;
   /*
-    //The following signals are undefined, or duplicated.
+    //The following signals are undefined or (if noted) duplicates.
     case SIGCANCEL:
       printf("%*s %i\n", 25, "SIGCANCEL: ", SIGCANCEL);
       break;
