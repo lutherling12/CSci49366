@@ -1,0 +1,10 @@
+Homework: Write a program that starts two threads writing into the same text
+file. The threads should be each reading book records from the command line and
+populating the text file with these records. Have each thread accumulate the record
+entries from the command line into an array of strings. This should be the threadspecific
+data. Both threads should independently update this array of strings with
+their input. By using thread-specific data, the final array of strings should be
+consistent and should contain complete entries from both threads. For bonus: Have
+the data entry accept as many command line entries as issued until an EOF
+character is encountered. Implement this as a signal.
+Due: Tuesday, May 5th, 2015. 

@@ -1,0 +1,7 @@
+Homework: Write a user daemon that outputs the current time every 10 seconds
+into a log file at the same level with the source code for the daemon in the directory
+hierarchy. Have the configuration file redirect the log file to this place. Then change
+the configuration file to output elsewhere. Send the daemon a signal telling it that
+the configuration file was changed, forcing it to reread it and start sending the log
+messages at the new location.
+Due: Tuesday, May 5th, 2015.
