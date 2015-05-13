@@ -11,16 +11,13 @@ by W. Richard Stevens and Stephen A. Rago.
 
 It can be found [here](http://www.amazon.com/Advanced-Programming-UNIX-Environment-Edition/dp/0321637739).
 
-##Homework 1:
-1. Write a two-page history of UNIX, from any resources you may find (the
-Internet, Richard Stevens’ book etc.), which should include an enumeration
-and short description of the current flavor of UNIX.
-2. Write a small system program that creates a file and writes your name in it,
+##Homework 1: myNameIs
+Write a small system program that creates a file and writes your name in it,
 taking your name as input from the command line. It should use the system
 functions creat() and write(). For the synopsis of these functions, consult
 section 2 of the man pages on your system
 
-##Homework 2:
+##Homework 2: Book List
 Write a C program that replaces or inserts a row in the books.txt file. You can
 specify your own row number as the row that needs to be replaced. You can supply
 your own record (for instance, your favorite book and its author). The books.txt file
@@ -28,10 +25,12 @@ contains book records, each with two fields: a book title field (with no blank s
 in it) and an author field (again, with no blank spaces in it). You should be able to
 replace the record at the row number specified, with your own.
 
-##Homework 3:
-1. Write a small program that illustrates the use of the chown() system call on a
-file. Due Tuesday, February 17, 2015.
-2. Write a program that displays all the information from the stat structure about a
+##Homework 3.1: chown
+Write a small program that illustrates the use of the chown() system call on a
+file.
+
+##Homework 3.2: File Stat
+Write a program that displays all the information from the stat structure about a
 file in a “formatted” table, with the constant names on the left, and their binary
 values on the right. In particular, the st_mode member of the stat structure,
 which encodes the file type and the permissions mode, should be broken down into
@@ -47,7 +46,7 @@ There are 16 bits for st_mode (no two leading 0 bits as in the mask examples):
 + 4 for the file type
 + 9 for access permissions
 
-##Homework 4:
+##Homework 4: Foward Tree Walk (FTW)
 Copy, adapt, and compile the program that traverses a file hierarchy from Chapter
 4, Files and Directories. Taking as input a starting pathname, the program
 descends the file hierarchy from that point, and returns how many files of each of
@@ -55,13 +54,15 @@ the seven types there are, and what percentage of the total that represents. (Yo
 need to revisit Chapter 2, UNIX Standardizations and Implementations, and
 create a *.c and a *.h file for path_alloc().)
 
-##Homework 5:
-1. Write a program that finds all users on a system. You should test for a large
+##Homework 5.1: UID
+Write a program that finds all users on a system. You should test for a large
 number of UID numbers, since no function returns that information wholesale.
-2. Modify the program that returns supplementary GIDs for a user to also list
+
+##Homework 5.2: GID
+Modify the program that returns supplementary GIDs for a user to also list
 these groups’ names. 
 
-##Homework 6:
+##Homework 6: Signals
 Write a simple program showing the system call sigsuspend().
 Your program should initialize three sets of signals (oldset, newset, waitset) to the
 empty set, using sigemptyset(). It should then add a few signals to this set, using
